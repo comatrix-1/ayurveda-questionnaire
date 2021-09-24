@@ -21,7 +21,7 @@
 
     $.ajax({
         type: "GET",
-        url: "/ayurveda.csv",
+        url: "./ayurveda.csv",
         success: function (data) {
             $('body').append(arrayToTable(Papa.parse(data).data));
         }
