@@ -4,6 +4,11 @@ Age,55+,,,17-55,,,0-16,,
 `
 console.log("hello world");
 
+var data = new XMLHttpRequest();
+data.open("GET", "ayurveda.csv", true);
+
+var data = $.csv.toObjects(data);
+
 	$('#files').parse({
 		config: {
 			delimiter: "auto",
