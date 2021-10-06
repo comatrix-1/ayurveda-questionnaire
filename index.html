@@ -1,58 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ayurveda dosha survey</title>
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.js"></script>
-	<script>
-    	function arrayToTable(tableData) {
-        var table = $('<table></table>');
-        $(tableData).each(function (i, rowData) {
-            var row = $('<tr></tr>');
-            $(rowData).each(function (j, cellData) {
-                row.append($('<td>'+cellData+'</td>'));
-            });
-            table.append(row);
-        });
-        return table;
-    }
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.js"></script>
+    <script></script>
+    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="stylesheet.css" />
+</head>
 
-    $.ajax({
-        type: "GET",
-        url: "ayurveda-questionnaire/ayurveda.csv",
-        success: function (data) {
-            $('body').append(arrayToTable(Papa.parse(data).data));
-        }
-    });
-</script>
+<body>
+    <h1>Ayurveda dosha survey</h1>
+    <p id="intro">
+        This survey serves to determine your dosha. These are the elements that make up our body, consisting of the six elements air, ether, fire, water, water and earth. When doshas are out of balance, we won't perform optimally e.g. feel overwhelmed, tired
+        or fall sick. Vikruti is the set of
+        <em>imbalances</em> currently in our body and mind and will change over time as our bodies are in constant change. Prakriti is our natural doshic constitution and restoring our vikruti back to this essential constitution is one of the key principles
+        in ayurveda.
+        <br />
+        <br /> This survey seeks to help you find your tendencies, i.e. your doshic constitution. To better understand prakriti tendencies, think of what you were like when you were younger, or for the most part of your life.
+    </p>
+    <form class="container grid-12">
+        <span class="heading left-4">Question</span>
+        <span class="heading mid-4">Vikruti</span>
+        <span class="heading right-4">Prakriti</span>
+    </form>
+    <div id="resultContainer" class="container flex-column text-center">
+        <h2>Your Dosha Result</h2>
+        <p id="result">Your results will show here.</p>
+    </div>
+    <!-- <input type="file" id="input" multiple /> -->
 
-	<script src="script.js" defer></script>
-  </head>
-  <body>
-    
-<!--CSV upload      -->
-  <form class="form-inline">
-	<div class="form-group">
-	  <label for="files">Upload a CSV formatted file:</label>
-	  <input type="file" id="files"  class="form-control" accept=".csv" required />
-	</div>
-	<div class="form-group">
-	 <button type="submit" id="submit-file" class="btn btn-primary">Upload File</button>
-	 </div>
-</form>
-    
-<!--test dropdown -->
-  <label for="cars">Survey:</label>
-  <select name="cars" id="cars">
-    <option value="volvo">Volvo</option>
+    <!-- CSV upload     
+    <form class="form-inline">
+        <div class="form-group">
+            <label for="files">Upload a CSV formatted file:</label>
+            <input type="file" id="files" class="form-control" accept=".csv" required />
+        </div>
+        <div class="form-group">
+            <button type="submit" id="submit-file" class="btn btn-primary">Upload File</button>
+        </div>
+    </form> -->
+
+    <!-- test dropdown
+    <form>
+        <label for="cars">Survey:</label>
+        <select name="cars" id="cars">
+    <option value="volvo">55+</option>
     <option value="saab">Saab</option>
     <option value="opel">Opel</option>
     <option value="audi">Audi</option>
   </select>
-  <br><br>
-  <input type="submit" value="Submit">
-</form>
+    </form> -->
+
+    <!-- <br><br>
+    <input type="submit" value="Submit">
+    </form> -->
 </body>
+
 </html>
