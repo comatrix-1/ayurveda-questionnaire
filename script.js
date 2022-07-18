@@ -4,7 +4,7 @@ let body = document.querySelector("body");
 let form = document.querySelector("form");
 
 let survey = Papa.parse(
-    "https://comatrix-1.github.io/ayurveda-questionnaire/test.csv", {
+    "https://comatrix-1.github.io/ayurveda-questionnaire/ayurveda.csv", {
         header: true,
         download: true,
         complete: function(survey) {
@@ -19,7 +19,9 @@ const displayForm = function() {
     ayurveda.data.forEach((item) => {
         let label = document.createElement("label");
         label.classList.add("left-4");
-        label.innerText = item.Question;
+        label.innerText =
+            item.Question[0].toUpperCase() +
+            item.Question.slice(1, item.Question.length);
 
         let options = `
         <option value="0"></option>
@@ -95,66 +97,34 @@ const evaluate = function(sum) {
         vikruti: "",
         prakriti: "",
     };
-    // if (vataVikruti == 0 || pittaVikruti == 0 || kaphaVikruti == 0) {
-    //     vikrutiOverall.innerText = `Please answer all the questions.`;
-    // } else
-    if (
-        sum.vikruti.vata == sum.vikruti.pitta &&
-        sum.vikruti.pitta == sum.vikruti.kapha
-    ) {
-        evaluation.vikruti = `VATA/PITTA/KAPHA`;
-    } else if (sum.vikruti.vata == sum.vikruti.pitta) {
-        evaluation.vikruti = `VATA/PITTA`;
-    } else if (sum.vikruti.kapha == sum.vikruti.pitta) {
-        evaluation.vikruti = `PITTA/KAPHA`;
-    } else if (
-        sum.vikruti.vata > sum.vikruti.pitta &&
-        sum.vikruti.vata > sum.vikruti.kapha
-    ) {
-        evaluation.vikruti = `VATA`;
-    } else if (
-        sum.vikruti.pitta > sum.vikruti.vata &&
-        sum.vikruti.pitta > sum.vikruti.kapha
-    ) {
-        evaluation.vikruti = `PITTA`;
-    } else if (
-        sum.vikruti.kapha > sum.vikruti.vata &&
-        sum.vikruti.kapha > sum.vikruti.pitta
-    ) {
-        evaluation.vikruti = `KAPHA`;
-    } else {
-        evaluation.vikruti = "";
-    }
 
-    // if (sum.prakriti.vata == 0 || sum.prakriti.pitta == 0 || sum.prakriti.kapha == 0) {
-    //     prakritiOverall.innerText = `Please answer all the questions.`;
-    // } else
-    if (
-        sum.prakriti.vata == sum.prakriti.pitta &&
-        sum.prakriti.pitta == sum.prakriti.kapha
-    ) {
-        evaluation.prakriti = `VATA/PITTA/KAPHA`;
-    } else if (sum.prakriti.vata == sum.prakriti.pitta) {
-        evaluation.prakriti = `VATA/PITTA`;
-    } else if (sum.prakriti.kapha == sum.prakriti.pitta) {
-        evaluation.prakriti = `PITTA/KAPHA`;
-    } else if (
-        sum.prakriti.vata > sum.prakriti.pitta &&
-        sum.prakriti.vata > sum.prakriti.kapha
-    ) {
-        prakritiOverall.innerText = `VATA`;
-    } else if (
-        sum.prakriti.pitta > sum.prakriti.vata &&
-        sum.prakriti.pitta > sum.prakriti.kapha
-    ) {
-        evaluation.prakriti = `PITTA`;
-    } else if (
-        sum.prakriti.kapha > sum.prakriti.vata &&
-        sum.prakriti.kapha > sum.prakriti.pitta
-    ) {
-        evaluation.prakriti = `KAPHA`;
-    } else {
-        evaluation.prakriti = "";
+    for (const item in evaluation) {
+        switch (true) {
+            case sum[item].vata == sum[item].pitta &&
+            sum[item].pitta == sum[item].kapha:
+                evaluation[item] = `VATA/PITTA/KAPHA`;
+                break;
+            case sum[item].pitta > sum[item].vata &&
+            sum[item].pitta > sum[item].kapha:
+                evaluation[item] = `PITTA`;
+                break;
+            case sum[item].kapha > sum[item].vata &&
+            sum[item].kapha > sum[item].pitta:
+                evaluation[item] = `KAPHA`;
+                break;
+            case sum[item].vata > sum[item].pitta && sum[item].vata > sum[item].kapha:
+                evaluation[item] = `VATA`;
+                break;
+            case sum[item].vata == sum[item].pitta:
+                evaluation[item] = `VATA/PITTA`;
+                break;
+            case sum[item].pitta == sum[item].kapha:
+                evaluation[item] = `PITTA/KAPHA`;
+                break;
+            case sum[item].vata == sum[item].kapha:
+                evaluation[item] = `VATA/KAPHA`;
+                break;
+        }
     }
 
     return evaluation;
@@ -189,68 +159,75 @@ const recommend = function(sum) {
 
 const generateResult = function() {
     let [sum, unfilled] = calculate();
-    console.log(unfilled);
-
     let result = document.createElement("div");
     result.setAttribute("id", "result");
 
-    if (unfilled == 0) {
-        let evaluation = evaluate(sum);
-        let recommendList = recommend(sum);
+    let evaluation = evaluate(sum);
+    let recommendList = recommend(sum);
 
-        for (const item in sum) {
-            resultItem = document.createElement("div");
-            resultItem.classList.add("result-item");
+    // unfilled, if any
 
-            resultScore = document.createElement("div");
-            resultScore.classList.add("left-4");
-            resultScore.innerHTML = `
-        <h2>${item} result</h2>
-        <p class="score">Vata: ${sum[item].vata}, Pitta: ${sum[item].pitta}, Kapha: ${sum[item].kapha}</p>
+    errorText = document.createElement("p");
+    errorText.classList.add("text-center");
+    if (unfilled == 1) {
+        errorText.innerText += ` There is ${unfilled} empty field. Are you sure you've completed the questionnaire?`;
+    } else if (unfilled > 1) {
+        errorText.innerText += ` There are ${unfilled} empty fields. Are you sure you've completed the questionnaire?`;
+    }
+    result.append(errorText);
+
+    // result items vikruti and prakriti divs
+
+    for (const item in sum) {
+        resultItem = document.createElement("div");
+        resultItem.classList.add("result-item");
+
+        resultScore = document.createElement("div");
+        resultScore.classList.add("left-4");
+        resultScore.innerHTML = `
+        <h2>${item[0].toUpperCase() + item.slice(1, item.length)} result</h2>
+        <p class="score">Vata: ${sum[item].vata}, Pitta: ${
+      sum[item].pitta
+    }, Kapha: ${sum[item].kapha}</p>
         `;
 
-            resultEvaluation = document.createElement("div");
-            resultEvaluation.classList.add("right-8");
-            resultEvaluation.innerHTML = `
+        resultEvaluation = document.createElement("div");
+        resultEvaluation.classList.add("right-8");
+        resultEvaluation.innerHTML = `
         <p class="evaluation">${evaluation[item]}</p>
         `;
 
-            resultItem.append(resultScore, resultEvaluation);
-            result.append(resultItem);
+        resultItem.append(resultScore, resultEvaluation);
+        result.append(resultItem);
+    }
+
+    // recommendation portion
+
+    recommendationDiv = document.createElement("div");
+    recommendationDiv.innerHTML = `
+            <h2>Recommended action</h2>
+            `;
+    recommendationDiv.classList.add("text-center");
+
+    recommendationList = document.createElement("ul");
+    recommendList.forEach((item) => {
+        if (item !== null) {
+            let listItem = document.createElement("li");
+            listItem.innerText = item;
+            recommendationList.append(listItem);
         }
+    });
 
-        // recommendation portion
-
-        recommendationDiv = document.createElement("div");
-        recommendationDiv.innerHTML = `
-    <h2>Recommended action</h2>
-    `;
-
-        recommendationList = document.createElement("ul");
-        recommendationList.classList.add("full-width");
-        recommendList.forEach((item) => {
-            if (item !== null) {
-                let listItem = document.createElement("li");
-                listItem.innerText = item;
-                recommendationList.append(listItem);
-            }
-        });
-
-        if (recommendationList.innerText == "") {
-            recommendationList = document.createElement("p");
-            recommendationList.innerText = `
+    if (recommendationList.innerText == "") {
+        recommendationList = document.createElement("p");
+        recommendationList.innerText = `
         Your doshas are balanced.
         `;
-        }
-
-        recommendationDiv.append(recommendationList);
-
-        result.append(recommendationDiv);
-    } else {
-        errorText = document.createElement("p");
-        errorText.innerText = `Please fill out entire survey to view results. There are ${unfilled} unfilled fields.`;
-        result.append(errorText);
     }
+
+    recommendationDiv.append(recommendationList);
+
+    result.append(recommendationDiv);
 
     return result;
 };
